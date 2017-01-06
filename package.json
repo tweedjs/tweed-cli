@@ -1,0 +1,33 @@
+{
+  "name": "tweed-cli",
+  "version": "0.2.0",
+  "description": "CLI for Tweed",
+  "homepage": "https://github.com/tweedjs/tweed-cli",
+  "license": "WTFPL",
+  "keywords": [
+    "ui",
+    "vdom",
+    "oop",
+    "tweed",
+    "cli"
+  ],
+  "bugs": {
+    "url": "https://github.com/tweedjs/tweed/issues"
+  },
+  "main": "./dist/index.js",
+  "repository": "tweedjs/tweed-cli",
+  "author": "Emil Persson <emil.n.persson@gmail.com> (https://emilpersson.se)",
+  "bin": {
+    "tweed": "./dist/tweed.js"
+  },
+  "standard": {
+    "parser": "babel-eslint"
+  },
+  "scripts": {
+    "prepublish": "make"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "tweed-babel-config": "^0.2.0"
+  }
+}
