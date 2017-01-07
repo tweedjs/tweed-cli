@@ -135,7 +135,7 @@ export default class NewCommand {
         gray('Project Name: ') + yellow(name),
         gray('Directory:    ') + yellow(relativeDirectory),
         gray('Compiler:     ') + (compiler ? yellow(compiler.name) : gray('none')),
-        gray('Task Runner: ') + (taskRunner ? yellow(taskRunner.name) : gray('none')),
+        gray('Task Runner:  ') + (taskRunner ? yellow(taskRunner.name) : gray('none')),
         gray('Test Runner:  ') + (testRunner ? yellow(testRunner.name) : gray('none')),
         '\r\n',
         blue('Is this correct?')
