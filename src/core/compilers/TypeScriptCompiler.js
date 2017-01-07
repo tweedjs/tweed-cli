@@ -11,10 +11,7 @@ export default class TypeScriptCompiler {
   }
 
   async install (directory, packageManager, taskRunner) {
-    await packageManager.install(['typescript', 'tweed-typescript-config', 'ts-loader'], {
-      pwd: directory,
-      dev: true
-    })
+    packageManager.install(['typescript', 'tweed-typescript-config'], { dev: true })
 
     const tsconfigFile = this._path.resolve(directory, 'tsconfig.json')
 
@@ -32,20 +29,25 @@ export default class TypeScriptCompiler {
       tsconfig.extends = tweedConfig
     }
 
-    tsconfig.compilerOptions = {
-      outDir: 'dist'
-    }
-
     tsconfig.include = [
       'src/**/*.ts',
       'src/**/*.tsx'
     ]
 
     await this._fs.writeJson(tsconfigFile, tsconfig)
+  }
 
-    if (taskRunner != null) {
-      taskRunner.add('build', 'tsc')
-    }
+  manipulateWebpackConfig (config, packageManager) {
+    config.module = config.module || {}
+    config.module.loaders = config.module.loaders || []
+
+    config.module.loaders.push({
+      loader: "'ts'",
+      test: '/\\.tsx?$/',
+      exclude: '/node_modules/'
+    })
+
+    packageManager.install('ts-loader', { dev: true })
   }
 
   async main () {

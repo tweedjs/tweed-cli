@@ -1,5 +1,5 @@
 export default class Builder {
-  constructor (chalk, process, path, fs, console, logger, spinner, { packageManagers, compilers, taskRunners, testRunners }) {
+  constructor (chalk, process, path, fs, console, logger, spinner, { packageManagers, compilers, taskRunners, testRunners, bundlers }) {
     this._chalk = chalk
     this._process = process
     this._path = path
@@ -11,6 +11,7 @@ export default class Builder {
     this.compilers = compilers
     this.taskRunners = taskRunners
     this.testRunners = testRunners
+    this.bundlers = bundlers
   }
 
   async build ({
@@ -20,6 +21,7 @@ export default class Builder {
     taskRunner,
     backup,
     testRunner,
+    bundler,
     program,
     packageManager
   }) {
@@ -38,6 +40,10 @@ export default class Builder {
         await compiler.install(directory, packageManager, taskRunner)
       }
 
+      if (bundler != null) {
+        await bundler.install(directory, packageManager, compiler, taskRunner)
+      }
+
       if (taskRunner != null) {
         await taskRunner.install(directory)
       }
@@ -45,6 +51,8 @@ export default class Builder {
       if (testRunner != null) {
         await testRunner.install(directory, packageManager)
       }
+
+      await packageManager.flush(directory)
 
       this._stopSpinner()
 
@@ -111,6 +119,8 @@ export default class Builder {
   async _installBase (directory, packageManager, compiler) {
     const packageJson = this._path.resolve(directory, 'package.json')
     const src = this._path.resolve(directory, 'src')
+    const publicDir = this._path.resolve(directory, 'public')
+    const indexHtml = this._path.resolve(publicDir, 'index.html')
     const ext = compiler && compiler.extension || 'js'
     const mainFileName = `main.${ext}`
     const main = this._path.resolve(src, mainFileName)
@@ -138,7 +148,17 @@ export default class Builder {
       await this._fs.writeFile(app, compiler && await compiler.app() || await this._app())
     }
 
-    await packageManager.install('tweed', { pwd: directory, dev: false })
+    if (!(await this._fs.exists(publicDir))) {
+      this._logger.fine('Creating public directory')
+      await this._fs.makeDirectory(publicDir)
+    }
+
+    if (!(await this._fs.exists(indexHtml))) {
+      this._logger.fine(`Creating src/index.html`)
+      await this._fs.writeFile(indexHtml, await this._indexHtml())
+    }
+
+    packageManager.install('tweed')
   }
 
   async _main () {
@@ -181,7 +201,7 @@ export default class Builder {
       'App.prototype.render = function () {',
       '  return (',
       "    Node('div', {},",
-      "      Node('h1', {}, 'Hello ' + this.name)",
+      "      Node('h1', {}, 'Hello ' + this.name),",
       "      Node('input', {",
       '        value: this.name,',
       "        'on-input': this._setName",
@@ -189,6 +209,23 @@ export default class Builder {
       '    )',
       '  )',
       '}'
+    ].join('\n')
+  }
+
+  _indexHtml () {
+    return [
+      '<!DOCTYPE html>',
+      "<html lang='en'>",
+      '  <head>',
+      "    <meta charset='utf-8'>",
+      "    <meta http-equiv='x-ua-compatible' content='ie=edge'>",
+      "    <meta name='viewport' content='width=device-width, initial-scale=1'>",
+      '  </head>',
+      '  <body>',
+      "    <div id='app'>Loading...</div>",
+      "    <script src='/main.bundle.js'></script>",
+      '  </body>',
+      '</html>'
     ].join('\n')
   }
 }

@@ -33,6 +33,9 @@ import MakeTaskRunner from './core/taskRunners/MakeTaskRunner'
 import JestTestRunner from './core/testRunners/JestTestRunner'
 import MochaTestRunner from './core/testRunners/MochaTestRunner'
 
+// Bundlers
+import WebpackBundler from './core/bundlers/WebpackBundler'
+
 const logger = new Logger(chalk)
 const filesystem = new FileSystem(logger, fs, path, jsonfile)
 const console = new Console(logger, process, childProcess, commandExists)
@@ -61,6 +64,9 @@ const builder = new Builder(
     testRunners: [
       new JestTestRunner(logger),
       new MochaTestRunner(logger)
+    ],
+    bundlers: [
+      new WebpackBundler(logger, filesystem, path)
     ]
   }
 )

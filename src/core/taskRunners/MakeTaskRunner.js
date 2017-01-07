@@ -32,14 +32,14 @@ export default class MakeTaskRunner {
   }
 
   _generate () {
-    let buffer = []
-
-    for (const command in this.commands) {
-      buffer.push(`.PHONY: ${command}`)
-      buffer.push(`${command}:`)
-      buffer.push(`\t${this.commands[command]}`)
-    }
-
-    return buffer.join('\n') + '\n'
+    return Object.keys(this.commands)
+      .map(
+        (command) => [
+          `.PHONY: ${command}`,
+          `${command}:`,
+          `\t${this.commands[command]}`
+        ].join('\n')
+      )
+      .join('\n\n')
   }
 }

@@ -11,10 +11,7 @@ export default class BabelCompiler {
   }
 
   async install (directory, packageManager, taskRunner) {
-    await packageManager.install(['babel-cli', 'tweed-babel-config', 'babel-loader'], {
-      pwd: directory,
-      dev: true
-    })
+    packageManager.install(['babel-core', 'tweed-babel-config'], { dev: true })
 
     const rcFile = this._path.resolve(directory, '.babelrc')
 
@@ -33,10 +30,19 @@ export default class BabelCompiler {
     }
 
     await this._fs.writeJson(rcFile, rc)
+  }
 
-    if (taskRunner != null) {
-      taskRunner.add('build', 'babel src --out-dir dist')
-    }
+  manipulateWebpackConfig (config, packageManager) {
+    config.module = config.module || {}
+    config.module.loaders = config.module.loaders || []
+
+    config.module.loaders.push({
+      loader: "'babel'",
+      test: '/\\.jsx?$/',
+      exclude: '/node_modules/'
+    })
+
+    packageManager.install('babel-loader', { dev: true })
   }
 
   async main () {

@@ -7,6 +7,7 @@ export default class NewCommand {
     name: null,
     compiler: 'babel',
     taskRunner: 'npm',
+    bundler: 'webpack',
     testRunner: null,
     interactive: true,
     backup: true
@@ -40,6 +41,19 @@ export default class NewCommand {
         }
         return [2, { name: argv[1] }]
 
+      // The bundler to use
+      case '-b':
+      case '--bundler':
+        const bundlers = this._builder.bundlers.map((b) => b.id)
+
+        if ([...bundlers, 'none'].indexOf(argv[1]) === -1) {
+          program.abort(
+            `The available bundlers are: ${bundlers.join(', ')}.\n` +
+            "Pass 'none' to not include a bundler. 'webpack' is the default."
+          )
+        }
+        return [2, { bundler: argv[1] === 'none' ? null : argv[1] }]
+
       // The task runner to use: defaults to 'npm'
       case '-r':
       case '--task-runner':
@@ -47,7 +61,7 @@ export default class NewCommand {
 
         if ([...taskRunners, 'none'].indexOf(argv[1]) === -1) {
           program.abort(
-            `The available build systems are: ${taskRunners.join(', ')}.\n` +
+            `The available task runners are: ${taskRunners.join(', ')}.\n` +
             "Pass 'none' to not include a task runner. 'npm' is the default."
           )
         }
@@ -106,6 +120,7 @@ export default class NewCommand {
     compiler,
     taskRunner,
     testRunner,
+    bundler,
     interactive,
     backup
   }, program) {
@@ -118,6 +133,8 @@ export default class NewCommand {
       .filter((c) => c.id === taskRunner)[0]
     testRunner = this._builder.testRunners
       .filter((c) => c.id === testRunner)[0]
+    bundler = this._builder.bundlers
+      .filter((c) => c.id === bundler)[0]
 
     let relativeDirectory = this._path.relative(this._process.cwd(), directory)
 
@@ -134,6 +151,7 @@ export default class NewCommand {
         '',
         gray('Project Name: ') + yellow(name),
         gray('Directory:    ') + yellow(relativeDirectory),
+        gray('Bundler:      ') + (bundler ? yellow(bundler.name) : gray('none')),
         gray('Compiler:     ') + (compiler ? yellow(compiler.name) : gray('none')),
         gray('Task Runner:  ') + (taskRunner ? yellow(taskRunner.name) : gray('none')),
         gray('Test Runner:  ') + (testRunner ? yellow(testRunner.name) : gray('none')),
@@ -159,6 +177,7 @@ export default class NewCommand {
       taskRunner,
       backup,
       testRunner,
+      bundler,
       packageManager,
       program
     })
