@@ -9,7 +9,11 @@ export default class Program {
   execute (argv) {
     const request = this._parseRequest(argv)
 
-    request.command.execute(request.options, this)
+    return Promise.resolve(
+      request.command.execute(request.options, this)
+    ).catch((e) => {
+      this.abort(e.stack)
+    })
   }
 
   _parseRequest (argv) {
