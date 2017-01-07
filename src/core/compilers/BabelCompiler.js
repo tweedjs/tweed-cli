@@ -10,7 +10,7 @@ export default class BabelCompiler {
     this._path = path
   }
 
-  async install (directory, packageManager, buildSystem) {
+  async install (directory, packageManager, taskRunner) {
     await packageManager.install(['babel-cli', 'tweed-babel-config', 'babel-loader'], {
       pwd: directory,
       dev: true
@@ -34,8 +34,8 @@ export default class BabelCompiler {
 
     await this._fs.writeJson(rcFile, rc)
 
-    if (buildSystem != null) {
-      buildSystem.add('build', 'babel src --out-dir dist')
+    if (taskRunner != null) {
+      taskRunner.add('build', 'babel src --out-dir dist')
     }
   }
 

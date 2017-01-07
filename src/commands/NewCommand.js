@@ -6,7 +6,7 @@ export default class NewCommand {
     directory: null,
     name: null,
     compiler: 'babel',
-    buildSystem: 'npm',
+    taskRunner: 'npm',
     testRunner: null,
     interactive: true,
     backup: true
@@ -40,18 +40,18 @@ export default class NewCommand {
         }
         return [2, { name: argv[1] }]
 
-      // The build system to use: defaults to 'npm'
-      case '-b':
-      case '--build-system':
-        const buildSystems = this._builder.buildSystems.map((b) => b.id)
+      // The task runner to use: defaults to 'npm'
+      case '-r':
+      case '--task-runner':
+        const taskRunners = this._builder.taskRunners.map((b) => b.id)
 
-        if ([...buildSystems, 'none'].indexOf(argv[1]) === -1) {
+        if ([...taskRunners, 'none'].indexOf(argv[1]) === -1) {
           program.abort(
-            `The available build systems are: ${buildSystems.join(', ')}.\n` +
-            "Pass 'none' to not include a build system. 'npm' is the default."
+            `The available build systems are: ${taskRunners.join(', ')}.\n` +
+            "Pass 'none' to not include a task runner. 'npm' is the default."
           )
         }
-        return [2, { buildSystem: argv[1] === 'none' ? null : argv[1] }]
+        return [2, { taskRunner: argv[1] === 'none' ? null : argv[1] }]
 
       // The test runner to use: defaults to 'none'
       case '-t':
@@ -104,7 +104,7 @@ export default class NewCommand {
     directory,
     name,
     compiler,
-    buildSystem,
+    taskRunner,
     testRunner,
     interactive,
     backup
@@ -114,8 +114,8 @@ export default class NewCommand {
     backup = backup && await this._fs.exists(directory)
     compiler = this._builder.compilers
       .filter((c) => c.id === compiler)[0]
-    buildSystem = this._builder.buildSystems
-      .filter((c) => c.id === buildSystem)[0]
+    taskRunner = this._builder.taskRunners
+      .filter((c) => c.id === taskRunner)[0]
     testRunner = this._builder.testRunners
       .filter((c) => c.id === testRunner)[0]
 
@@ -135,7 +135,7 @@ export default class NewCommand {
         gray('Project Name: ') + yellow(name),
         gray('Directory:    ') + yellow(relativeDirectory),
         gray('Compiler:     ') + (compiler ? yellow(compiler.name) : gray('none')),
-        gray('Build System: ') + (buildSystem ? yellow(buildSystem.name) : gray('none')),
+        gray('Task Runner: ') + (taskRunner ? yellow(taskRunner.name) : gray('none')),
         gray('Test Runner:  ') + (testRunner ? yellow(testRunner.name) : gray('none')),
         '\r\n',
         blue('Is this correct?')
@@ -156,7 +156,7 @@ export default class NewCommand {
       directory,
       name,
       compiler,
-      buildSystem,
+      taskRunner,
       backup,
       testRunner,
       packageManager,

@@ -1,4 +1,4 @@
-export default class NPMBuildSystem {
+export default class NPMTaskRunner {
   id = 'npm'
   name = 'NPM scripts'
   commands = {}

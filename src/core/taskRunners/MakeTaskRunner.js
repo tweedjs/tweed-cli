@@ -1,4 +1,4 @@
-export default class MakeBuildSystem {
+export default class MakeTaskRunner {
   id = 'make'
   name = 'Makefile'
   commands = {}

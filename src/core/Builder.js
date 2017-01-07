@@ -1,5 +1,5 @@
 export default class Builder {
-  constructor (chalk, process, path, fs, console, logger, spinner, { packageManagers, compilers, buildSystems, testRunners }) {
+  constructor (chalk, process, path, fs, console, logger, spinner, { packageManagers, compilers, taskRunners, testRunners }) {
     this._chalk = chalk
     this._process = process
     this._path = path
@@ -9,7 +9,7 @@ export default class Builder {
     this._spinner = spinner
     this.packageManagers = packageManagers
     this.compilers = compilers
-    this.buildSystems = buildSystems
+    this.taskRunners = taskRunners
     this.testRunners = testRunners
   }
 
@@ -17,7 +17,7 @@ export default class Builder {
     directory,
     name,
     compiler,
-    buildSystem,
+    taskRunner,
     backup,
     testRunner,
     program,
@@ -35,11 +35,11 @@ export default class Builder {
       await this._installBase(directory, packageManager, compiler)
 
       if (compiler != null) {
-        await compiler.install(directory, packageManager, buildSystem)
+        await compiler.install(directory, packageManager, taskRunner)
       }
 
-      if (buildSystem != null) {
-        await buildSystem.install(directory)
+      if (taskRunner != null) {
+        await taskRunner.install(directory)
       }
 
       if (testRunner != null) {
@@ -48,7 +48,7 @@ export default class Builder {
 
       this._stopSpinner()
 
-      this._logger.log('Done!', this._chalk.gray(this._startCommand(buildSystem, directory)))
+      this._logger.log('Done!', this._chalk.gray(this._startCommand(taskRunner, directory)))
     } catch (e) {
       this._stopSpinner()
 
@@ -78,12 +78,12 @@ export default class Builder {
     }
   }
 
-  _startCommand (buildSystem, directory) {
+  _startCommand (taskRunner, directory) {
     const cwd = this._process.cwd()
 
     return [
       directory === cwd ? null : 'cd ' + this._path.relative(cwd, directory),
-      buildSystem ? buildSystem.usage('dev') : null
+      taskRunner ? taskRunner.usage('dev') : null
     ].filter((p) => p != null).join('; ')
   }
 

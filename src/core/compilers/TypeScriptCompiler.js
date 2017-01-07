@@ -10,7 +10,7 @@ export default class TypeScriptCompiler {
     this._path = path
   }
 
-  async install (directory, packageManager, buildSystem) {
+  async install (directory, packageManager, taskRunner) {
     await packageManager.install(['typescript', 'tweed-typescript-config', 'ts-loader'], {
       pwd: directory,
       dev: true
@@ -43,8 +43,8 @@ export default class TypeScriptCompiler {
 
     await this._fs.writeJson(tsconfigFile, tsconfig)
 
-    if (buildSystem != null) {
-      buildSystem.add('build', 'tsc')
+    if (taskRunner != null) {
+      taskRunner.add('build', 'tsc')
     }
   }
 

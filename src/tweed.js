@@ -25,9 +25,9 @@ import NPMPackageManager from './core/packageManagers/NPMPackageManager'
 import BabelCompiler from './core/compilers/BabelCompiler'
 import TypeScriptCompiler from './core/compilers/TypeScriptCompiler'
 
-// Build Systems
-import NPMBuildSystem from './core/buildSystems/NPMBuildSystem'
-import MakeBuildSystem from './core/buildSystems/MakeBuildSystem'
+// Task Runners
+import NPMTaskRunner from './core/taskRunners/NPMTaskRunner'
+import MakeTaskRunner from './core/taskRunners/MakeTaskRunner'
 
 // Test Runners
 import JestTestRunner from './core/testRunners/JestTestRunner'
@@ -54,9 +54,9 @@ const builder = new Builder(
       new BabelCompiler(logger, filesystem, path),
       new TypeScriptCompiler(logger, filesystem, path)
     ],
-    buildSystems: [
-      new NPMBuildSystem(logger, filesystem, path),
-      new MakeBuildSystem(logger, filesystem, path)
+    taskRunners: [
+      new NPMTaskRunner(logger, filesystem, path),
+      new MakeTaskRunner(logger, filesystem, path)
     ],
     testRunners: [
       new JestTestRunner(logger),
