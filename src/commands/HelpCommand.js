@@ -2,6 +2,7 @@ export default class HelpCommand {
   name = 'help'
   description = 'Shows help pages'
   usage = 'tweed [help|-h] [-v|--verbose] [command]'
+  options = []
 
   constructor (chalk) {
     this._chalk = chalk
@@ -55,10 +56,30 @@ export default class HelpCommand {
   }
 
   _help (command, program, verbose) {
+    const options = [
+      ['-v, --verbose', 'Verbose output'],
+      ...command.options
+    ]
+    const optionColWidth = Math.max(
+      ...options.map(([o]) => o.length)
+    )
     return [
       this._chalk.gray('Usage: ' + command.usage),
       '',
-      command.description
+      this._chalk.blue(command.description),
+      '',
+      this._chalk.yellow('Available options:'),
+      ...options
+        .map(([option, description]) => [
+          this._chalk.blue(
+            option + new Array(optionColWidth - option.length).fill(' ').join('')
+          ),
+          this._chalk.gray(description)
+        ])
+        .map(([option, description]) =>
+          `${option}  ${description}`
+        ),
+      ''
     ].join('\n')
   }
 }

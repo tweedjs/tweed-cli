@@ -2,6 +2,7 @@ export default class VersionCommand {
   name = 'version'
   description = 'Shows versions of installed Tweed packages'
   usage = 'tweed [version|-V] [-v|--verbose] [command]'
+  options = []
 
   constructor (chalk) {
     this._chalk = chalk

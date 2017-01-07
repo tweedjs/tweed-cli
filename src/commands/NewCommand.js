@@ -29,6 +29,19 @@ export default class NewCommand {
     this._fs = fs
     this._builder = builder
     this._console = console
+
+    const ids = (p, def) =>
+      p.map((p) => def === p.id ? chalk.underline(p.id) : p.id).join(', ')
+
+    this.options = [
+      ['-n, --name', 'The name of the app'],
+      ['-b, --bundler', `A module bundler to use (none, ${ids(builder.bundlers, 'webpack')})`],
+      ['-r, --task-runner', `A task runner to use (none, ${ids(builder.taskRunners, 'npm')})`],
+      ['-t, --test-runner', `A test runner to use (${chalk.underline('none')}, ${ids(builder.testRunners)})`],
+      ['-c, --compiler', `A compiler to use (none, ${ids(builder.compilers, 'babel')})`],
+      ['--no-backup', "Don't back up to a .old if installing to existing directory"],
+      ['--no-interaction', "Don't ask for confirmation before installing"]
+    ]
   }
 
   parseOption (argv, program) {

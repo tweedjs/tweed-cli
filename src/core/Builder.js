@@ -34,7 +34,7 @@ export default class Builder {
     }
 
     try {
-      await this._installBase(directory, packageManager, compiler)
+      await this._installBase(name, directory, packageManager, compiler)
 
       if (compiler != null) {
         await compiler.install(directory, packageManager, taskRunner)
@@ -91,7 +91,9 @@ export default class Builder {
 
     return [
       directory === cwd ? null : 'cd ' + this._path.relative(cwd, directory),
-      taskRunner ? taskRunner.usage('dev') : null
+      taskRunner && 'dev' in taskRunner.commands
+        ? taskRunner.usage('dev')
+        : null
     ].filter((p) => p != null).join('; ')
   }
 
@@ -116,8 +118,9 @@ export default class Builder {
     this._logger.fine('Backing up to', directory + '.old')
   }
 
-  async _installBase (directory, packageManager, compiler) {
+  async _installBase (name, directory, packageManager, compiler) {
     const packageJson = this._path.resolve(directory, 'package.json')
+    const gitignore = this._path.resolve(directory, '.gitignore')
     const src = this._path.resolve(directory, 'src')
     const publicDir = this._path.resolve(directory, 'public')
     const indexHtml = this._path.resolve(publicDir, 'index.html')
@@ -129,8 +132,21 @@ export default class Builder {
     const app = this._path.resolve(src, appFileName)
 
     if (!(await this._fs.exists(packageJson))) {
-      this._logger.fine('Creating an empty package.json file')
-      await this._fs.writeFile(packageJson, '{}\n')
+      this._logger.fine('Creating a package.json file')
+      const pkg = {
+        name,
+        version: '0.0.0'
+      }
+      await this._fs.writeFile(packageJson, JSON.stringify(pkg, null, 2) + '\n')
+    }
+
+    if (!(await this._fs.exists(gitignore))) {
+      this._logger.fine('Creating a .gitignore file')
+      await this._fs.writeFile(gitignore, [
+        '/node_modules/',
+        '/public/main.min.js',
+        ''
+      ].join('\n'))
     }
 
     if (!(await this._fs.exists(src))) {
