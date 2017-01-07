@@ -1,5 +1,6 @@
 export default class Program {
-  constructor (chalk, helpCommand, versionCommand, commands) {
+  constructor (logger, chalk, helpCommand, versionCommand, commands) {
+    this._logger = logger
     this._chalk = chalk
     this._helpCommand = helpCommand
     this._versionCommand = versionCommand
@@ -8,6 +9,8 @@ export default class Program {
 
   execute (argv) {
     const request = this._parseRequest(argv)
+
+    this._logger.verbose = request.options.verbose
 
     return Promise.resolve(
       request.command.execute(request.options, this)

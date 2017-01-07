@@ -18,7 +18,8 @@ export default class NewCommand {
     chalk,
     input,
     fs,
-    builder
+    builder,
+    console
   ) {
     this._path = path
     this._process = process
@@ -26,6 +27,7 @@ export default class NewCommand {
     this._input = input
     this._fs = fs
     this._builder = builder
+    this._console = console
   }
 
   parseOption (argv, program) {
@@ -105,8 +107,7 @@ export default class NewCommand {
     buildSystem,
     testRunner,
     interactive,
-    backup,
-    verbose
+    backup
   }, program) {
     directory = this._path.resolve(directory || this._process.cwd())
     name = name || this._path.basename(directory)
@@ -147,14 +148,18 @@ export default class NewCommand {
       )
     }
 
+    const packageManager = await this._console.commandExists('yarn')
+      ? this._builder.packageManagers.yarn
+      : this._builder.packageManagers.npm
+
     return this._builder.build({
-      verbose,
       directory,
       name,
       compiler,
       buildSystem,
       backup,
       testRunner,
+      packageManager,
       program
     })
   }

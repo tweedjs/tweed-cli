@@ -4,11 +4,22 @@ import 'regenerator-runtime/runtime'
 import { Program, NewCommand, VersionCommand, HelpCommand } from '.'
 import chalk from 'chalk'
 import * as path from 'path'
+import * as childProcess from 'child_process'
 import input from 'inquirer'
 import * as fs from 'node-fs-extra'
+import * as jsonfile from 'jsonfile'
+import commandExists from 'command-exists'
+import ora from 'ora'
+
 import FileSystem from './core/FileSystem'
+import Console from './core/Console'
+import Logger from './core/Logger'
 
 import Builder from './core/Builder'
+
+// Package Managers
+import YarnPackageManager from './core/packageManagers/YarnPackageManager'
+import NPMPackageManager from './core/packageManagers/NPMPackageManager'
 
 // Compilers
 import BabelCompiler from './core/compilers/BabelCompiler'
@@ -22,35 +33,45 @@ import MakeBuildSystem from './core/buildSystems/MakeBuildSystem'
 import JestTestRunner from './core/testRunners/JestTestRunner'
 import MochaTestRunner from './core/testRunners/MochaTestRunner'
 
-const filesystem = new FileSystem(fs, path)
+const logger = new Logger(chalk)
+const filesystem = new FileSystem(logger, fs, path, jsonfile)
+const console = new Console(logger, process, childProcess, commandExists)
 
 const builder = new Builder(
   chalk,
   process,
   path,
   filesystem,
+  console,
+  logger,
+  ora,
   {
+    packageManagers: {
+      yarn: new YarnPackageManager(console),
+      npm: new NPMPackageManager(console)
+    },
     compilers: [
-      new BabelCompiler(),
-      new TypeScriptCompiler()
+      new BabelCompiler(logger, filesystem, path),
+      new TypeScriptCompiler(logger, filesystem, path)
     ],
     buildSystems: [
-      new NPMBuildSystem(),
-      new MakeBuildSystem()
+      new NPMBuildSystem(logger, filesystem, path),
+      new MakeBuildSystem(logger, filesystem, path)
     ],
     testRunners: [
-      new JestTestRunner(),
-      new MochaTestRunner()
+      new JestTestRunner(logger),
+      new MochaTestRunner(logger)
     ]
   }
 )
 
 const cli = new Program(
+  logger,
   chalk,
   new HelpCommand(chalk),
   new VersionCommand(chalk),
   [
-    new NewCommand(path, process, chalk, input, filesystem, builder)
+    new NewCommand(path, process, chalk, input, filesystem, builder, console)
   ]
 )
 

@@ -2,7 +2,12 @@ export default class MochaTestRunner {
   id = 'mocha'
   name = 'Mocha'
 
-  async install (log) {
+  constructor (logger) {
+    this._logger = logger
+  }
+
+  async install () {
+    const log = this._logger.log.bind(this._logger)
     log('Installing Mocha')
   }
 }

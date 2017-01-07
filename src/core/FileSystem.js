@@ -1,7 +1,9 @@
 export default class FileSystem {
-  constructor (fs, path) {
+  constructor (logger, fs, path, jsonfile) {
+    this._logger = logger
     this._fs = fs
     this._path = path
+    this._jsonfile = jsonfile
   }
 
   exists (path) {
@@ -11,24 +13,32 @@ export default class FileSystem {
   }
 
   makeDirectory (path) {
-    return new Promise((resolve, reject) => {
-      this._fs.mkdirs(path, (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
-    })
+    return this._promise(this._fs.mkdirs, path)
   }
 
   copy (from, to) {
+    return this._promise(this._fs.copy, from, to)
+  }
+
+  writeFile (file, content) {
+    return this._promise(this._fs.writeFile, file, content)
+  }
+
+  readJson (file) {
+    return this._promise(this._jsonfile.readFile, file)
+  }
+
+  writeJson (file, json) {
+    return this._promise(this._jsonfile.writeFile, file, json, { spaces: 2 })
+  }
+
+  _promise (fn, ...args) {
     return new Promise((resolve, reject) => {
-      this._fs.copy(from, to, (err) => {
+      fn(...args, (err, ...resp) => {
         if (err) {
           reject(err)
         } else {
-          resolve()
+          resolve(...resp)
         }
       })
     })
