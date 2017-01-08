@@ -29,6 +29,8 @@ export default class TypeScriptCompiler {
       tsconfig.extends = tweedConfig
     }
 
+    tsconfig.compilerOptions = {}
+
     tsconfig.include = [
       'src/**/*.ts',
       'src/**/*.tsx'
@@ -48,6 +50,88 @@ export default class TypeScriptCompiler {
     })
 
     packageManager.install('ts-loader', { dev: true })
+  }
+
+  async jestConfig (directory, packageManager) {
+    packageManager.install(['ts-jest', '@types/jest'], { dev: true })
+
+    const packageJson = this._path.resolve(directory, 'package.json')
+
+    const pkg = await this._fs.readJson(packageJson)
+
+    pkg.jest = {
+      transform: {
+        '^.+\\.(ts|tsx)$': '<rootDir>/node_modules/ts-jest/preprocessor.js'
+      },
+      testRegex: '/__tests__/.*\\.(ts|tsx|js)$',
+      moduleFileExtensions: [ 'ts', 'tsx', 'js' ]
+    }
+
+    await this._fs.writeJson(packageJson, pkg)
+
+    await this._writeTestFile(
+      directory,
+      '__tests__',
+      'test',
+      'expect',
+      'toEqual',
+      "import 'jest'"
+    )
+  }
+
+  async mochaConfig (directory, packageManager, taskRunner) {
+    packageManager.install(['ts-node', '@types/mocha', '@types/chai'], { dev: true })
+
+    await this._writeTestFile(
+      directory,
+      'test',
+      'it',
+      'expect',
+      'to.deep.equal',
+      "import { expect } from 'chai'"
+    )
+
+    if (taskRunner != null) {
+      taskRunner.add('test', 'mocha --require ts-node/register test/**/*.ts*')
+    }
+  }
+
+  async _writeTestFile (directory, testDir, test, expect, toEqual, head) {
+    const testFile = this._path.resolve(directory, testDir, 'App.test.tsx')
+
+    await this._fs.writeFile(testFile, [
+      ...(head ? [head] : []),
+      "import { Node } from 'tweed'",
+      "import App from '../src/App'",
+      '',
+      "describe('App', () => {",
+      `  ${test}('it works', () => {`,
+      '    const app = new App()',
+      '',
+      `    ${expect}(app.render()).${toEqual}(`,
+      '      <div>',
+      "        <h1>Hello {'World'}</h1>",
+      '        <input',
+      "          value='World'",
+      '          on-input={app._setName}',
+      '        />',
+      '      </div>',
+      '    )',
+      '',
+      "    app.name = 'Changed'",
+      '',
+      `    ${expect}(app.render()).${toEqual}(`,
+      '      <div>',
+      "        <h1>Hello {'Changed'}</h1>",
+      '        <input',
+      "          value='Changed'",
+      '          on-input={app._setName}',
+      '        />',
+      '      </div>',
+      '    )',
+      '  })',
+      '})'
+    ].join('\n'))
   }
 
   async main () {

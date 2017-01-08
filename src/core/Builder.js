@@ -44,12 +44,12 @@ export default class Builder {
         await bundler.install(directory, packageManager, compiler, taskRunner)
       }
 
-      if (taskRunner != null) {
-        await taskRunner.install(directory)
+      if (testRunner != null) {
+        await testRunner.install(directory, packageManager, compiler, taskRunner)
       }
 
-      if (testRunner != null) {
-        await testRunner.install(directory, packageManager)
+      if (taskRunner != null) {
+        await taskRunner.install(directory)
       }
 
       await packageManager.flush(directory)

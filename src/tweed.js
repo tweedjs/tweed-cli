@@ -62,8 +62,8 @@ const builder = new Builder(
       new MakeTaskRunner(logger, filesystem, path)
     ],
     testRunners: [
-      new JestTestRunner(logger),
-      new MochaTestRunner(logger)
+      new JestTestRunner(logger, filesystem, path),
+      new MochaTestRunner(logger, filesystem, path)
     ],
     bundlers: [
       new WebpackBundler(logger, filesystem, path)
