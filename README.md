@@ -60,3 +60,39 @@ scripts.
 ### Test Runners
 Use `tweed new --test-runner jest|mocha` to install one of those test frameworkers, as
 well as some boilerplate.
+
+## Generating components
+Use `tweed generate` to create new components quickly.
+
+```shell
+$ tweed generate MyClass
+Generated src/MyClass.js
+```
+
+The command will use hints from the environment to figure out if you're using TypeScript
+or Babel. Otherwise it generates ES5 components.
+
+You can add mutating fields to the components using the `--mutating` option.
+
+```shell
+$ tweed generate Counter --mutating count --mutating otherField -m thirdField
+Generated src/Counter.js
+```
+
+If you're using TypeScript, you can provide the types of the fields by separating with a
+colon:
+
+```shell
+$ tweed generate Counter --mutating count:number
+Generated src/Counter.tsx
+```
+
+To simultaneously create directories, namespace the component with periods or slashes:
+
+```shell
+$ tweed generate pages.start.StartPage
+Generated src/pages/start/StartPage.js
+
+$ tweed generate data/Repository
+Generated src/data/Repository.js
+```
