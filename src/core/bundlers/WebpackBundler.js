@@ -25,10 +25,10 @@ export default class WebpackBundler {
     }
 
     config.plugins = "process.env.NODE_ENV === 'production'\n" +
-      '? [\n' +
-      '  new webpack.optimize.UglifyJsPlugin()' +
-      ']\n' +
-      ': []'
+      '    ? [\n' +
+      '      new webpack.optimize.UglifyJsPlugin()\n' +
+      '    ]\n' +
+      '    : []'
 
     const json = JSON
       .stringify(config, null, 2)
