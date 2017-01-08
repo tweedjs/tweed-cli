@@ -150,11 +150,11 @@ export default class GenerateCommand {
       filename = `${className}.test`
       testDir = '__tests__'
       if (useTypeScript) {
-        generate = this._generateTypeScriptTest.bind(this, 'test', className, importPath)
+        generate = this._generateTypeScriptTest.bind(this, 'test', className, 'expect', 'toEqual', importPath)
       } else if (useBabel) {
-        generate = this._generateBabelTest.bind(this, 'test', className, importPath)
+        generate = this._generateBabelTest.bind(this, 'test', className, 'expect', 'toEqual', importPath)
       } else {
-        generate = this._generateES5Test.bind(this, 'test', className, importPath)
+        generate = this._generateES5Test.bind(this, 'test', className, 'expect', 'toEqual', importPath)
       }
     }
 
@@ -162,11 +162,11 @@ export default class GenerateCommand {
       filename = `${className}Test`
       testDir = 'test'
       if (useTypeScript) {
-        generate = this._generateTypeScriptTest.bind(this, 'it', className, importPath, "import { expect } from 'chai'")
+        generate = this._generateTypeScriptTest.bind(this, 'it', className, 'expect', 'to.deep.equal', importPath, "import { expect } from 'chai'")
       } else if (useBabel) {
-        generate = this._generateBabelTest.bind(this, 'it', className, importPath, "import { expect } from 'chai'")
+        generate = this._generateBabelTest.bind(this, 'it', className, 'expect', 'to.deep.equal', importPath, "import { expect } from 'chai'")
       } else {
-        generate = this._generateES5Test.bind(this, 'it', className, importPath, "const { expect } = require('chai')")
+        generate = this._generateES5Test.bind(this, 'it', className, 'expect', 'to.deep.equal', importPath, "const { expect } = require('chai')")
       }
     }
 
@@ -174,6 +174,15 @@ export default class GenerateCommand {
       filename,
       testDir,
       generate
+    }
+  }
+
+  _jsxHeader () {
+    const pkg = require(process.cwd() + '/package.json')
+    const useStandard = 'standard' in pkg.devDependencies
+
+    if (useStandard) {
+      return '/** @jsx Node */'
     }
   }
 
@@ -200,7 +209,8 @@ export default class ${name} {${
 
   _generateBabel (name, mutating) {
     const isStateful = mutating.length > 0
-    return `
+    const jsxHeader = this._jsxHeader()
+    return `${jsxHeader ? jsxHeader + '\n' : ''}
 import { ${isStateful ? 'mutating, ' : ''}Node } from 'tweed'
 
 export default class ${name} {${
@@ -250,7 +260,9 @@ ${name}.prototype.render = function () {
     `.trim() + '\n'
   }
 
-  _generateTypeScriptTest (test, className, importPath, head) {
+  _generateTypeScriptTest (test, className, expect, toEqual, importPath, head) {
+    const varName = className[0].toLowerCase() + className.slice(1)
+
     return `${
   head ? '\n' + head : ''
 }
@@ -258,29 +270,40 @@ import { Node } from 'tweed'
 import ${className} from '${importPath}'
 
 describe('${className}', () => {
+  const ${varName} = new ${className}()
+
   ${test}('it works', () => {
-    throw 'Write tests for ${className}'
+    ${expect}(${varName}.render())
+      .${toEqual}(<div />)
   })
 })
     `.trim() + '\n'
   }
 
-  _generateBabelTest (test, className, importPath, head) {
-    return `${
+  _generateBabelTest (test, className, expect, toEqual, importPath, head) {
+    const varName = className[0].toLowerCase() + className.slice(1)
+    const jsxHeader = this._jsxHeader()
+
+    return `${jsxHeader ? jsxHeader + '\n' : ''}${
   head ? '\n' + head : ''
 }
 import { Node } from 'tweed'
 import ${className} from '${importPath}'
 
 describe('${className}', () => {
+  const ${varName} = new ${className}()
+
   ${test}('it works', () => {
-    throw 'Write tests for ${className}'
+    ${expect}(${varName}.render())
+      .${toEqual}(<div />)
   })
 })
     `.trim() + '\n'
   }
 
-  _generateES5Test (test, className, importPath, head) {
+  _generateES5Test (test, className, expect, toEqual, importPath, head) {
+    const varName = className[0].toLowerCase() + className.slice(1)
+
     return `${
   head ? '\n' + head : ''
 }
@@ -288,8 +311,11 @@ const { Node: n } = require('tweed')
 const ${className} = require('${importPath}')
 
 describe('${className}', () => {
+  var ${varName} = new ${className}()
+
   ${test}('it works', () => {
-    throw 'Write tests for ${className}'
+    ${expect}(${varName}.render())
+      .${toEqual}(n('div'))
   })
 })
     `.trim() + '\n'
