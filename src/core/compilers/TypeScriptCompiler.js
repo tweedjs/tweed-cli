@@ -52,7 +52,7 @@ export default class TypeScriptCompiler {
     packageManager.install('ts-loader', { dev: true })
   }
 
-  async jestConfig (directory, packageManager) {
+  async jestConfig (linter, directory, packageManager) {
     packageManager.install(['ts-jest', '@types/jest'], { dev: true })
 
     const packageJson = this._path.resolve(directory, 'package.json')
@@ -79,7 +79,7 @@ export default class TypeScriptCompiler {
     )
   }
 
-  async mochaConfig (directory, packageManager, taskRunner) {
+  async mochaConfig (linter, directory, packageManager, taskRunner) {
     packageManager.install(['ts-node', '@types/mocha', '@types/chai'], { dev: true })
 
     await this._writeTestFile(
@@ -131,7 +131,8 @@ export default class TypeScriptCompiler {
       '      </div>',
       '    )',
       '  })',
-      '})'
+      '})',
+      ''
     ].join('\n'))
   }
 
@@ -146,7 +147,8 @@ export default class TypeScriptCompiler {
       "  new DOMRenderer(document.querySelector('#app'))",
       ')',
       '',
-      'engine.render(new App())'
+      'engine.render(new App())',
+      ''
     ].join('\n')
   }
 
@@ -176,7 +178,8 @@ export default class TypeScriptCompiler {
       '      </div>',
       '    )',
       '  }',
-      '}'
+      '}',
+      ''
     ].join('\n')
   }
 }

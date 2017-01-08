@@ -1,13 +1,14 @@
 export default class NewCommand {
   name = 'new'
   description = 'Initiates a new Tweed project, or adds Tweed on top of an existing project.'
-  usage = 'tweed new [<directory>] [-n <name>] [-b <bundler>] [-r <task-runner>] [-t <test-runner>] [-c <compiler>] [--no-backup] [--no-interaction]'
+  usage = 'tweed new [<directory>] [-n <name>] [-b <bundler>] [-r <task-runner>] [-t <test-runner>] [-c <compiler>] [-l <linter>] [--no-backup] [--no-interaction]'
   initialOptions = {
     directory: null,
     name: null,
     compiler: 'babel',
     taskRunner: 'npm',
     bundler: 'webpack',
+    linter: null,
     testRunner: null,
     interactive: true,
     backup: true
@@ -39,6 +40,7 @@ export default class NewCommand {
       ['-r, --task-runner', `A task runner to use (none, ${ids(builder.taskRunners, 'npm')})`],
       ['-t, --test-runner', `A test runner to use (${chalk.underline('none')}, ${ids(builder.testRunners)})`],
       ['-c, --compiler', `A compiler to use (none, ${ids(builder.compilers, 'babel')})`],
+      ['-l, --linter', `A linter to use (${chalk.underline('none')}, ${ids(builder.linters)})`],
       ['--no-backup', "Don't back up to a .old if installing to existing directory"],
       ['--no-interaction', "Don't ask for confirmation before installing"]
     ]
@@ -106,6 +108,19 @@ export default class NewCommand {
         }
         return [2, { compiler: argv[1] === 'none' ? null : argv[1] }]
 
+      // The linter to use: defaults to 'none'
+      case '-l':
+      case '--linter':
+        const linters = this._builder.linters.map((b) => b.id)
+
+        if ([...linters, 'none'].indexOf(argv[1]) === -1) {
+          program.abort(
+            `The available linters are: ${linters.join(', ')}.\n` +
+            "Pass 'none' to not include a linter. 'none' is the default."
+          )
+        }
+        return [2, { linter: argv[1] === 'none' ? null : argv[1] }]
+
       // Whether or not to backup if patching an existing directory
       case '--no-backup':
         return [1, { backup: false }]
@@ -134,6 +149,7 @@ export default class NewCommand {
     taskRunner,
     testRunner,
     bundler,
+    linter,
     interactive,
     backup
   }, program) {
@@ -148,6 +164,8 @@ export default class NewCommand {
       .filter((c) => c.id === testRunner)[0]
     bundler = this._builder.bundlers
       .filter((c) => c.id === bundler)[0]
+    linter = this._builder.linters
+      .filter((c) => c.id === linter)[0]
 
     let relativeDirectory = this._path.relative(this._process.cwd(), directory)
 
@@ -168,6 +186,7 @@ export default class NewCommand {
         gray('Compiler:     ') + (compiler ? yellow(compiler.name) : gray('none')),
         gray('Task Runner:  ') + (taskRunner ? yellow(taskRunner.name) : gray('none')),
         gray('Test Runner:  ') + (testRunner ? yellow(testRunner.name) : gray('none')),
+        gray('Linter:       ') + (linter ? yellow(linter.name) : gray('none')),
         '\r\n',
         blue('Is this correct?')
       ].join('\n')
@@ -189,6 +208,7 @@ export default class NewCommand {
       compiler,
       taskRunner,
       backup,
+      linter,
       testRunner,
       bundler,
       packageManager,

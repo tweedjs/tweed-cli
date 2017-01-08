@@ -36,6 +36,9 @@ import MochaTestRunner from './core/testRunners/MochaTestRunner'
 // Bundlers
 import WebpackBundler from './core/bundlers/WebpackBundler'
 
+// Linters
+import StandardLinter from './core/linters/StandardLinter'
+
 const logger = new Logger(chalk)
 const filesystem = new FileSystem(logger, fs, path, jsonfile)
 const console = new Console(logger, process, childProcess, commandExists)
@@ -67,6 +70,9 @@ const builder = new Builder(
     ],
     bundlers: [
       new WebpackBundler(logger, filesystem, path)
+    ],
+    linters: [
+      new StandardLinter(logger, filesystem, path)
     ]
   }
 )

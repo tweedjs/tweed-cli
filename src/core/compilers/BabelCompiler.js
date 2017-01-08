@@ -45,10 +45,11 @@ export default class BabelCompiler {
     packageManager.install('babel-loader', { dev: true })
   }
 
-  async jestConfig (directory, packageManager) {
+  async jestConfig (linter, directory, packageManager) {
     packageManager.install('babel-jest', { dev: true })
 
     await this._writeTestFile(
+      linter,
       directory,
       '__tests__',
       'test',
@@ -57,10 +58,11 @@ export default class BabelCompiler {
     )
   }
 
-  async mochaConfig (directory, packageManager, taskRunner) {
+  async mochaConfig (linter, directory, packageManager, taskRunner) {
     packageManager.install('babel-register', { dev: true })
 
     await this._writeTestFile(
+      linter,
       directory,
       'test',
       'it',
@@ -74,10 +76,11 @@ export default class BabelCompiler {
     }
   }
 
-  async _writeTestFile (directory, testDir, test, expect, toEqual, head) {
+  async _writeTestFile (linter, directory, testDir, test, expect, toEqual, head) {
     const testFile = this._path.resolve(directory, testDir, 'App.test.js')
 
     await this._fs.writeFile(testFile, [
+      ...(linter && linter.jsxHeader ? [linter.jsxHeader, ''] : []),
       "import { Node } from 'tweed'",
       "import App from '../src/App'",
       ...(head ? [head] : []),
@@ -108,12 +111,14 @@ export default class BabelCompiler {
       '      </div>',
       '    )',
       '  })',
-      '})'
+      '})',
+      ''
     ].join('\n'))
   }
 
-  async main () {
+  async main (linter) {
     return [
+      ...(linter && linter.jsxHeader ? [linter.jsxHeader, ''] : []),
       "import { Engine } from 'tweed'",
       "import DOMRenderer from 'tweed/render/dom'",
       '',
@@ -123,12 +128,14 @@ export default class BabelCompiler {
       "  new DOMRenderer(document.querySelector('#app'))",
       ')',
       '',
-      'engine.render(new App())'
+      'engine.render(new App())',
+      ''
     ].join('\n')
   }
 
-  async app () {
+  async app (linter) {
     return [
+      ...(linter && linter.jsxHeader ? [linter.jsxHeader, ''] : []),
       "import { mutating, Node } from 'tweed'",
       '',
       'export default class App {',
@@ -153,7 +160,8 @@ export default class BabelCompiler {
       '      </div>',
       '    )',
       '  }',
-      '}'
+      '}',
+      ''
     ].join('\n')
   }
 }

@@ -1,6 +1,22 @@
 export default class JestTestRunner {
   id = 'jest'
   name = 'Jest'
+  globals = [
+    'afterEach',
+    'beforeEach',
+    'afterAll',
+    'beforeAll',
+    'describe',
+    'expect',
+    'it',
+    'fit',
+    'jest',
+    'test',
+    'xdescribe',
+    'fdescribe',
+    'xit',
+    'xtest'
+  ]
 
   constructor (logger, fs, path) {
     this._logger = logger
@@ -8,7 +24,7 @@ export default class JestTestRunner {
     this._path = path
   }
 
-  async install (directory, packageManager, compiler, taskRunner) {
+  async install (directory, packageManager, compiler, taskRunner, linter) {
     packageManager.install('jest', { dev: true })
 
     const testDir = this._path.resolve(directory, '__tests__')
@@ -19,7 +35,7 @@ export default class JestTestRunner {
     }
 
     if (compiler && compiler.jestConfig) {
-      await compiler.jestConfig(directory, packageManager)
+      await compiler.jestConfig(linter, directory, packageManager)
     } else {
       const testFile = this._path.resolve(testDir, 'App.test.js')
       await this._fs.writeFile(testFile, this._appTest())

@@ -1,5 +1,5 @@
 export default class Builder {
-  constructor (chalk, process, path, fs, console, logger, spinner, { packageManagers, compilers, taskRunners, testRunners, bundlers }) {
+  constructor (chalk, process, path, fs, console, logger, spinner, { packageManagers, compilers, taskRunners, testRunners, bundlers, linters }) {
     this._chalk = chalk
     this._process = process
     this._path = path
@@ -12,6 +12,7 @@ export default class Builder {
     this.taskRunners = taskRunners
     this.testRunners = testRunners
     this.bundlers = bundlers
+    this.linters = linters
   }
 
   async build ({
@@ -19,6 +20,7 @@ export default class Builder {
     name,
     compiler,
     taskRunner,
+    linter,
     backup,
     testRunner,
     bundler,
@@ -34,7 +36,7 @@ export default class Builder {
     }
 
     try {
-      await this._installBase(name, directory, packageManager, compiler)
+      await this._installBase(name, directory, packageManager, compiler, linter)
 
       if (compiler != null) {
         await compiler.install(directory, packageManager, taskRunner)
@@ -45,7 +47,11 @@ export default class Builder {
       }
 
       if (testRunner != null) {
-        await testRunner.install(directory, packageManager, compiler, taskRunner)
+        await testRunner.install(directory, packageManager, compiler, taskRunner, linter)
+      }
+
+      if (linter != null) {
+        await linter.install(directory, packageManager, taskRunner, compiler, testRunner)
       }
 
       if (taskRunner != null) {
@@ -118,7 +124,7 @@ export default class Builder {
     this._logger.fine('Backing up to', directory + '.old')
   }
 
-  async _installBase (name, directory, packageManager, compiler) {
+  async _installBase (name, directory, packageManager, compiler, linter) {
     const packageJson = this._path.resolve(directory, 'package.json')
     const gitignore = this._path.resolve(directory, '.gitignore')
     const src = this._path.resolve(directory, 'src')
@@ -156,12 +162,12 @@ export default class Builder {
 
     if (!(await this._fs.exists(main))) {
       this._logger.fine(`Creating src/${mainFileName}`)
-      await this._fs.writeFile(main, compiler && await compiler.main() || await this._main())
+      await this._fs.writeFile(main, compiler && await compiler.main(linter) || await this._main())
     }
 
     if (!(await this._fs.exists(app))) {
       this._logger.fine(`Creating src/${appFileName}`)
-      await this._fs.writeFile(app, compiler && await compiler.app() || await this._app())
+      await this._fs.writeFile(app, compiler && await compiler.app(linter) || await this._app())
     }
 
     if (!(await this._fs.exists(publicDir))) {
@@ -190,7 +196,8 @@ export default class Builder {
       "  new DOMRenderer(document.querySelector('#app'))",
       ')',
       '',
-      'engine.render(new App())'
+      'engine.render(new App())',
+      ''
     ].join('\n')
   }
 
@@ -224,7 +231,8 @@ export default class Builder {
       '      })',
       '    )',
       '  )',
-      '}'
+      '}',
+      ''
     ].join('\n')
   }
 
@@ -241,7 +249,8 @@ export default class Builder {
       "    <div id='app'>Loading...</div>",
       "    <script src='/main.bundle.js'></script>",
       '  </body>',
-      '</html>'
+      '</html>',
+      ''
     ].join('\n')
   }
 }

@@ -1,6 +1,14 @@
 export default class MochaTestRunner {
   id = 'mocha'
   name = 'Mocha'
+  globals = [
+    'afterEach',
+    'beforeEach',
+    'afterAll',
+    'beforeAll',
+    'describe',
+    'it'
+  ]
 
   constructor (logger, fs, path) {
     this._logger = logger
@@ -8,7 +16,7 @@ export default class MochaTestRunner {
     this._path = path
   }
 
-  async install (directory, packageManager, compiler, taskRunner) {
+  async install (directory, packageManager, compiler, taskRunner, linter) {
     packageManager.install(['mocha', 'chai'], { dev: true })
 
     const testDir = this._path.resolve(directory, 'test')
@@ -19,7 +27,7 @@ export default class MochaTestRunner {
     }
 
     if (compiler && compiler.mochaConfig) {
-      await compiler.mochaConfig(directory, packageManager, taskRunner)
+      await compiler.mochaConfig(linter, directory, packageManager, taskRunner)
     } else {
       const testFile = this._path.resolve(testDir, 'AppTest.js')
       await this._fs.writeFile(testFile, this._appTest())
