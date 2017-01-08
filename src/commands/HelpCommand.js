@@ -1,7 +1,7 @@
 export default class HelpCommand {
   name = 'help'
   description = 'Shows help pages'
-  usage = 'tweed [help|-h] [-v|--verbose] [command]'
+  usage = 'tweed [help|-h] [-v|--verbose] [<command>]'
   options = []
 
   constructor (chalk) {

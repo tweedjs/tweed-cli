@@ -1,7 +1,7 @@
 export default class NewCommand {
   name = 'new'
-  description = 'Initiates a new Tweed project, or adds Tweed on top of an existing project'
-  usage = 'tweed new'
+  description = 'Initiates a new Tweed project, or adds Tweed on top of an existing project.'
+  usage = 'tweed new [<directory>] [-n <name>] [-b <bundler>] [-r <task-runner>] [-t <test-runner>] [-c <compiler>] [--no-backup] [--no-interaction]'
   initialOptions = {
     directory: null,
     name: null,
