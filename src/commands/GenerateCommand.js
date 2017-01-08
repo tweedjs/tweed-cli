@@ -241,8 +241,7 @@ var mutating = Tweed.mutating`
   ) : ''
 }
 
-module.exports = ${name}
-function ${name} () {${
+var ${name} = module.exports = function ${name} () {${
   isStateful ? (
 `${mutating.map(([field]) => `
   this.${field} = null`
