@@ -1,14 +1,14 @@
 export default class GenerateCommand {
   name = 'generate'
   description = 'Generate files containing tedious boilerplate.'
-  usage = 'tweed generate <classpath> [-m <mutating-field>] [-t]'
+  usage = 'tweed generate <classpath> [-m <field>[:<type>]] [-t]'
   initialOptions = {
     classpath: null,
     mutating: [],
     test: false
   }
   options = [
-    ['-m, --mutating <mutating-field>', 'Add a mutating field to the component'],
+    ['-m, --mutating <field>[:<type>]', 'Add a mutating field to the component'],
     ['-t, --test', 'Generate a corresponding test file']
   ]
 
