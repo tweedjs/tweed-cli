@@ -24,6 +24,7 @@ Bundler:      Webpack
 Compiler:     Babel
 Task Runner:  NPM scripts
 Test Runner:  none
+Linter:       none
 
 Is this correct? (Y/n)
 ```
@@ -43,6 +44,7 @@ Bundler:      none
 Compiler:     none
 Task Runner:  none
 Test Runner:  none
+Linter:       none
 
 Is this correct? (Y/n)
 ```
@@ -60,6 +62,9 @@ scripts.
 ### Test Runners
 Use `tweed new --test-runner jest|mocha` to install one of those test frameworkers, as
 well as some boilerplate.
+
+### Linters
+Use `tweed new --linter standard` to install a linter for Standard JS.
 
 ## Generating components
 Use `tweed generate` to create new components quickly.
