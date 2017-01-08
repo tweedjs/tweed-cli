@@ -49,6 +49,11 @@ export default class TypeScriptCompiler {
       exclude: '/node_modules/'
     })
 
+    config.resolve = config.resolve || {}
+    config.resolve.extensions = config.resolve.extensions || ["''", "'.js'"]
+
+    config.resolve.extensions.push("'.ts'", "'.tsx'")
+
     packageManager.install('ts-loader', { dev: true })
   }
 
