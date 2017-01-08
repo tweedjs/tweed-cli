@@ -144,7 +144,7 @@ export default class Builder {
       this._logger.fine('Creating a .gitignore file')
       await this._fs.writeFile(gitignore, [
         '/node_modules/',
-        '/public/main.min.js',
+        '/public/main.bundle.js',
         ''
       ].join('\n'))
     }
