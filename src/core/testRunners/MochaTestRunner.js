@@ -66,7 +66,8 @@ export default class MochaTestRunner {
       '      )',
       '    )',
       '  })',
-      '})'
+      '})',
+      ''
     ].join('\n')
   }
 }

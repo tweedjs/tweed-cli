@@ -73,7 +73,8 @@ export default class JestTestRunner {
       '      )',
       '    )',
       '  })',
-      '})'
+      '})',
+      ''
     ].join('\n')
   }
 }
