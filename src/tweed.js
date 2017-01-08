@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import 'regenerator-runtime/runtime'
-import { Program, NewCommand, VersionCommand, HelpCommand } from '.'
+import { Program, NewCommand, VersionCommand, HelpCommand, GenerateCommand } from '.'
 import chalk from 'chalk'
 import * as path from 'path'
 import * as childProcess from 'child_process'
@@ -77,7 +77,8 @@ const cli = new Program(
   new HelpCommand(chalk),
   new VersionCommand(chalk),
   [
-    new NewCommand(path, process, chalk, input, filesystem, builder, console)
+    new NewCommand(path, process, chalk, input, filesystem, builder, console),
+    new GenerateCommand(chalk, logger, path, filesystem)
   ]
 )
 
