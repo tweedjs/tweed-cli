@@ -96,3 +96,12 @@ Generated src/pages/start/StartPage.js
 $ tweed generate data/Repository
 Generated src/data/Repository.js
 ```
+
+Add `--test` to generate a corresponding test case. Given that you have installed either
+Jest or Mocha (e.g. `tweed new --test-runner jest`):
+
+```shell
+$ tweed generate pages.start.StartPage -t
+Generated src/pages/start/StartPage.tsx
+Generated __tests__/pages/start/StartPage.test.tsx
+```
