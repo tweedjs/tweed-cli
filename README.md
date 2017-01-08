@@ -50,8 +50,8 @@ Is this correct? (Y/n)
 With this configuration, boilerplate will use ES5 JS and no tooling will be installed.
 
 ### TypeScript
-Run `tweed new --compiler typescript` to use install TypeScript tooling and use the
-language for boilerplate.
+Run `tweed new --compiler typescript` to install TypeScript tooling and use the language
+for boilerplate.
 
 ### Running tasks with a Makefile
 Run `tweed new --task-runner make` to put the scripts in a `Makefile` instead of NPM
