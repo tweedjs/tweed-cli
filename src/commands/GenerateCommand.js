@@ -1,13 +1,15 @@
 export default class GenerateCommand {
   name = 'generate'
   description = 'Generate files containing tedious boilerplate.'
-  usage = 'tweed generate <classpath> [-m <mutating-field>]'
+  usage = 'tweed generate <classpath> [-m <mutating-field>] [-t]'
   initialOptions = {
     classpath: null,
-    mutating: []
+    mutating: [],
+    test: false
   }
   options = [
-    ['-m, --mutating <mutating-field>', 'Add a mutating field to the component']
+    ['-m, --mutating <mutating-field>', 'Add a mutating field to the component'],
+    ['-t, --test', 'Generate a corresponding test file']
   ]
 
   constructor (chalk, logger, path, fs) {
@@ -26,6 +28,10 @@ export default class GenerateCommand {
         }
         return [2, { mutating: program.request.options.mutating.concat([argv[1].split(/\s*:\s*/)]) }]
 
+      case '-t':
+      case '--test':
+        return [1, { test: true }]
+
       default:
         if (argv[0][0] !== '-' && program.request.options.classpath == null) {
           return [1, { classpath: argv[0] }]
@@ -34,7 +40,7 @@ export default class GenerateCommand {
     }
   }
 
-  async execute ({ classpath, mutating }, program) {
+  async execute ({ classpath, mutating, test }, program) {
     const { extension, delimiter, generate } = await this._environment()
 
     if (classpath == null) {
@@ -59,11 +65,29 @@ export default class GenerateCommand {
 
     classpath = classpath.split(/\/|\\|\./)
     let className = classpath.pop()
-    classpath.push(className + '.' + extension)
+    const filepath = classpath.concat(className + '.' + extension)
 
     className = this._forceUpperCamelCase(className)
 
-    const targetFile = this._path.resolve('src', ...classpath)
+    const targetFile = this._path.resolve('src', ...filepath)
+
+    await this._generateFile(program, targetFile, () => generate(className, mutating))
+
+    if (test) {
+      const importPath = new Array(classpath.length + 1)
+        .fill('..')
+        .concat('src', classpath)
+        .join('/') + '/' + className
+
+      const { filename, testDir, generate } = await this._testEnvironment(importPath, program, className)
+      const filepath = classpath.concat(filename + '.' + extension)
+      const targetFile = this._path.resolve(testDir, ...filepath)
+
+      await this._generateFile(program, targetFile, generate)
+    }
+  }
+
+  async _generateFile (program, targetFile, generate) {
     const targetDir = this._path.dirname(targetFile)
     const relative = this._path.relative(process.cwd(), targetFile)
 
@@ -73,7 +97,7 @@ export default class GenerateCommand {
       program.abort(relative + ' already exists.')
     }
 
-    await this._fs.writeFile(targetFile, generate(className, mutating))
+    await this._fs.writeFile(targetFile, generate())
 
     this._logger.log('Generated', relative)
   }
@@ -106,6 +130,50 @@ export default class GenerateCommand {
         }
         return this._generateES5(name, mutating)
       }
+    }
+  }
+
+  async _testEnvironment (importPath, program, className) {
+    const useTypeScript = await this._fs.exists('tsconfig.json')
+    const useBabel = await this._fs.exists('.babelrc')
+    const pkg = require(process.cwd() + '/package.json')
+    const useJest = 'jest' in pkg.devDependencies
+    const useMocha = 'mocha' in pkg.devDependencies
+
+    if (!(useJest || useMocha)) {
+      program.abort("To include a test file you have to install 'jest' or 'mocha'")
+    }
+
+    let filename, testDir, generate
+
+    if (useJest) {
+      filename = `${className}.test`
+      testDir = '__tests__'
+      if (useTypeScript) {
+        generate = this._generateTypeScriptTest.bind(this, 'test', className, importPath)
+      } else if (useBabel) {
+        generate = this._generateBabelTest.bind(this, 'test', className, importPath)
+      } else {
+        generate = this._generateES5Test.bind(this, 'test', className, importPath)
+      }
+    }
+
+    if (useMocha) {
+      filename = `${className}Test`
+      testDir = 'test'
+      if (useTypeScript) {
+        generate = this._generateTypeScriptTest.bind(this, 'it', className, importPath, "import { expect } from 'chai'")
+      } else if (useBabel) {
+        generate = this._generateBabelTest.bind(this, 'it', className, importPath, "import { expect } from 'chai'")
+      } else {
+        generate = this._generateES5Test.bind(this, 'it', className, importPath, "const { expect } = require('chai')")
+      }
+    }
+
+    return {
+      filename,
+      testDir,
+      generate
     }
   }
 
@@ -179,6 +247,51 @@ mutating(${name}.prototype, '${field}')`
 ${name}.prototype.render = function () {
   return n('div')
 }
+    `.trim() + '\n'
+  }
+
+  _generateTypeScriptTest (test, className, importPath, head) {
+    return `${
+  head ? '\n' + head : ''
+}
+import { Node } from 'tweed'
+import ${className} from '${importPath}'
+
+describe('${className}', () => {
+  ${test}('it works', () => {
+    throw 'Write tests for ${className}'
+  })
+})
+    `.trim() + '\n'
+  }
+
+  _generateBabelTest (test, className, importPath, head) {
+    return `${
+  head ? '\n' + head : ''
+}
+import { Node } from 'tweed'
+import ${className} from '${importPath}'
+
+describe('${className}', () => {
+  ${test}('it works', () => {
+    throw 'Write tests for ${className}'
+  })
+})
+    `.trim() + '\n'
+  }
+
+  _generateES5Test (test, className, importPath, head) {
+    return `${
+  head ? '\n' + head : ''
+}
+const { Node: n } = require('tweed')
+const ${className} = require('${importPath}')
+
+describe('${className}', () => {
+  ${test}('it works', () => {
+    throw 'Write tests for ${className}'
+  })
+})
     `.trim() + '\n'
   }
 }

@@ -71,11 +71,11 @@ export default class TypeScriptCompiler {
 
     await this._writeTestFile(
       directory,
+      'App.test.tsx',
       '__tests__',
       'test',
       'expect',
-      'toEqual',
-      "import 'jest'"
+      'toEqual'
     )
   }
 
@@ -84,6 +84,7 @@ export default class TypeScriptCompiler {
 
     await this._writeTestFile(
       directory,
+      'AppTest.tsx',
       'test',
       'it',
       'expect',
@@ -96,8 +97,8 @@ export default class TypeScriptCompiler {
     }
   }
 
-  async _writeTestFile (directory, testDir, test, expect, toEqual, head) {
-    const testFile = this._path.resolve(directory, testDir, 'App.test.tsx')
+  async _writeTestFile (directory, filename, testDir, test, expect, toEqual, head) {
+    const testFile = this._path.resolve(directory, testDir, filename)
 
     await this._fs.writeFile(testFile, [
       ...(head ? [head] : []),
