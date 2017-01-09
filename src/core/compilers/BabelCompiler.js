@@ -116,9 +116,8 @@ export default class BabelCompiler {
     ].join('\n'))
   }
 
-  async main (linter) {
+  async main () {
     return [
-      ...(linter && linter.jsxHeader ? [linter.jsxHeader, ''] : []),
       "import { Engine } from 'tweed'",
       "import DOMRenderer from 'tweed/render/dom'",
       '',
