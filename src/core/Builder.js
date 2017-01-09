@@ -246,7 +246,7 @@ export default class Builder {
       '  </head>',
       '  <body>',
       "    <div id='app'>Loading...</div>",
-      "    <script src='/main.bundle.js'></script>",
+      "    <script src='main.bundle.js'></script>",
       '  </body>',
       '</html>',
       ''
