@@ -118,16 +118,11 @@ export default class BabelCompiler {
 
   async main () {
     return [
-      "import { Engine } from 'tweed'",
-      "import DOMRenderer from 'tweed/render/dom'",
+      "import render from 'tweed/render/dom'",
       '',
       "import App from './App'",
       '',
-      'const engine = new Engine(',
-      "  new DOMRenderer(document.querySelector('#app'))",
-      ')',
-      '',
-      'engine.render(new App())',
+      "render(new App(), document.querySelector('#app'))",
       ''
     ].join('\n')
   }

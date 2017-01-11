@@ -187,16 +187,11 @@ export default class Builder {
     return [
       "'use strict'",
       '',
-      "var Tweed = require('tweed')",
-      "var DOMRenderer = require('tweed/render/dom').default",
+      "var render = require('tweed/render/dom').default",
       '',
       "var App = require('./App')",
       '',
-      'var engine = new Tweed.Engine(',
-      "  new DOMRenderer(document.querySelector('#app'))",
-      ')',
-      '',
-      'engine.render(new App())',
+      "engine.render(new App(), document.querySelector('#app'))",
       ''
     ].join('\n')
   }
@@ -208,7 +203,7 @@ export default class Builder {
       "var Tweed = require('tweed')",
       'var n = Tweed.Node',
       '',
-      'var App = module.exports = function App () {',
+      'function App () {',
       "  this.name = 'World'",
       '',
       '  this._setName = this._setName.bind(this)',
@@ -233,6 +228,8 @@ export default class Builder {
       '    )',
       '  )',
       '}',
+      '',
+      'module.exports = App',
       ''
     ].join('\n')
   }

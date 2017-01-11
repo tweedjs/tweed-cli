@@ -1,6 +1,6 @@
 {
   "name": "tweed-cli",
-  "version": "0.2.10",
+  "version": "0.3.0",
   "description": "CLI for Tweed",
   "homepage": "https://github.com/tweedjs/tweed-cli",
   "license": "WTFPL",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
-    "tweed-babel-config": "^0.2.0"
+    "tweed-babel-config": "^0.3.0"
   },
   "dependencies": {
     "chalk": "^1.1.3",
