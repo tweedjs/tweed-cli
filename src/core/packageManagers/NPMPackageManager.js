@@ -10,7 +10,7 @@ export default class NPMPackageManager {
     return this._console.execute('npm', args, { pwd })
   }
 
-  install (packageName, { dev = false }) {
+  install (packageName, { dev = false } = {}) {
     if (dev) {
       this._devDependencies = this._devDependencies.concat(packageName)
     } else {
