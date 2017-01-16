@@ -26,7 +26,7 @@ export default class Console {
 
     return new Promise((resolve, reject) => {
       this._logger.fine(`Executing '${[command, ...args].join(' ')}'`)
-      const process = this._childProcess.spawn(command, args, { cwd: pwd })
+      const process = this._childProcess.spawn(command, args, { cwd: pwd, shell: true })
 
       if (showOutput) {
         process.stdout.pipe(this._process.stdout)
