@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import 'regenerator-runtime/runtime'
 import { Program, NewCommand, VersionCommand, HelpCommand, GenerateCommand } from '.'
 import chalk from 'chalk'
 import * as path from 'path'
