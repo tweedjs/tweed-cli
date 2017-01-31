@@ -37,7 +37,7 @@ export default class BabelCompiler {
     config.module.loaders = config.module.loaders || []
 
     config.module.loaders.push({
-      loader: "'babel'",
+      loader: "'babel-loader'",
       test: '/\\.jsx?$/',
       exclude: '/node_modules/'
     })
