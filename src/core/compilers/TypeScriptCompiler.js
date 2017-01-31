@@ -44,7 +44,7 @@ export default class TypeScriptCompiler {
     config.module.loaders = config.module.loaders || []
 
     config.module.loaders.push({
-      loader: "'ts'",
+      loader: "'ts-loader'",
       test: '/\\.tsx?$/',
       exclude: '/node_modules/'
     })

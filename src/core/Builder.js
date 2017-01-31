@@ -181,6 +181,8 @@ export default class Builder {
     }
 
     packageManager.install('tweed')
+    packageManager.install('babel-runtime')
+    packageManager.install('babel-polyfill')
   }
 
   async _main () {

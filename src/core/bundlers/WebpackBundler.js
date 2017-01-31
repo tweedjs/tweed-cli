@@ -52,7 +52,7 @@ export default class WebpackBundler {
     if (taskRunner != null) {
       packageManager.install('webpack-dev-server', { dev: true })
       taskRunner.add('build', 'NODE_ENV=production webpack')
-      taskRunner.add('dev', 'webpack-dev-server --inline --hot --content-base public/')
+      taskRunner.add('dev', 'webpack-dev-server --inline --hot --no-info --content-base public/')
     }
   }
 }
