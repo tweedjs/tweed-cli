@@ -50,7 +50,7 @@ export default class TypeScriptCompiler {
     })
 
     config.resolve = config.resolve || {}
-    config.resolve.extensions = config.resolve.extensions || ["'.js'"]
+    config.resolve.extensions = config.resolve.extensions || ["'*'", "'.js'"]
 
     config.resolve.extensions.push("'.ts'", "'.tsx'")
 
