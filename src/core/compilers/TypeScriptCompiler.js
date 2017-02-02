@@ -21,10 +21,10 @@ export default class TypeScriptCompiler {
 
     const tweedConfig = './node_modules/tweed-typescript-config/config'
 
-    if (typeof tsconfig.extends === 'string') {
-      tsconfig.extends = [tweedConfig, tsconfig.extends]
-    } else if (Array.isArray(tsconfig.extends)) {
-      tsconfig.extends = [tweedConfig, ...tsconfig.extends]
+    if ('extends' in tsconfig) {
+      this._logger.fine(
+        'The existing tsconfig.json file already extends another configuration. Skipping.'
+      )
     } else {
       tsconfig.extends = tweedConfig
     }
@@ -50,7 +50,7 @@ export default class TypeScriptCompiler {
     })
 
     config.resolve = config.resolve || {}
-    config.resolve.extensions = config.resolve.extensions || ["''", "'.js'"]
+    config.resolve.extensions = config.resolve.extensions || ["'*'", "'.js'"]
 
     config.resolve.extensions.push("'.ts'", "'.tsx'")
 

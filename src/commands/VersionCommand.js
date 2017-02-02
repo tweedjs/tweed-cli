@@ -4,8 +4,9 @@ export default class VersionCommand {
   usage = 'tweed [version|-V] [-v|--verbose]'
   options = []
 
-  constructor (chalk) {
+  constructor (chalk, path) {
     this._chalk = chalk
+    this._path = path
   }
 
   parseOption () {
@@ -56,10 +57,16 @@ export default class VersionCommand {
   }
 
   _versionOf (pkg) {
+    const globalPackage = `${pkg}/package`
+    const localPackage = this._path.resolve(`./node_modules/${globalPackage}`)
     try {
-      return require(`${pkg}/package`).version
+      return require(localPackage).version
     } catch (e) {
-      return null
+      try {
+        return require(globalPackage).version
+      } catch (e) {
+        return null
+      }
     }
   }
 }

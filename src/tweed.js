@@ -80,7 +80,7 @@ const cli = new Program(
   logger,
   chalk,
   new HelpCommand(chalk),
-  new VersionCommand(chalk),
+  new VersionCommand(chalk, path),
   [
     new NewCommand(path, process, chalk, input, filesystem, builder, console),
     new GenerateCommand(chalk, logger, path, filesystem)

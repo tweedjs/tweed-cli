@@ -62,7 +62,13 @@ export default class Builder {
 
       this._stopSpinner()
 
-      this._logger.log('Done!', this._chalk.gray(this._startCommand(taskRunner, directory)))
+      let message = 'Done!'
+
+      if (backup) {
+        message += ` Backup was created at ${directory}.old`
+      }
+
+      this._logger.log(message, this._chalk.gray(this._startCommand(taskRunner, directory, backup)))
     } catch (e) {
       this._stopSpinner()
 
@@ -71,7 +77,7 @@ export default class Builder {
       ]
 
       if (backup) {
-        lines.push('The original directory is available at ' + directory + '.old')
+        lines.push(`The original directory is available at ${directory}.old`)
       }
 
       lines.push(e.stack)
@@ -92,15 +98,23 @@ export default class Builder {
     }
   }
 
-  _startCommand (taskRunner, directory) {
+  _startCommand (taskRunner, directory, backup) {
     const cwd = this._process.cwd()
+    const relativeDir = this._path.relative(cwd, directory)
+    const rm = process.platform === 'win32'
+      ? 'rmdir /s'
+      : 'rm -rf'
+    const separator = process.platform === 'win32'
+      ? ' & '
+      : '; '
 
     return [
-      directory === cwd ? null : 'cd ' + this._path.relative(cwd, directory),
+      backup ? `${rm} ${relativeDir}.old` : null,
+      directory === cwd ? null : `cd ${relativeDir}`,
       taskRunner && 'dev' in taskRunner.commands
         ? taskRunner.usage('dev')
         : null
-    ].filter((p) => p != null).join('; ')
+    ].filter((p) => p != null).join(separator)
   }
 
   async _makeDirectory (directory) {
