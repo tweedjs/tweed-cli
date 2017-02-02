@@ -2,7 +2,7 @@ class StandardJS {
   jsxHeader = '/** @jsx Node */'
   packageName = 'standard'
 
-  modifyPackageJson (pkg, compiler, testRunner) {
+  modifyPackageJson (pkg, compiler, testRunner, packageManager) {
     pkg.standard = {}
 
     if (compiler && compiler.id === 'babel') {
@@ -48,16 +48,18 @@ export default class StandardLinter {
     const packageJson = this._path.resolve(directory, 'package.json')
     const pkg = await this._fs.readJson(packageJson)
 
-    implementation.modifyPackageJson(pkg, compiler, testRunner)
+    implementation.modifyPackageJson(pkg, compiler, testRunner, packageManager)
 
     if (pkg.standard && Object.keys(pkg.standard).length > 0) {
       await this._fs.writeJson(packageJson, pkg)
     }
 
-    if (taskRunner && taskRunner.commands.test != null) {
-      taskRunner.add('test', implementation.packageName + ' && ' + taskRunner.commands.test)
-    } else {
-      taskRunner.add('test', implementation.packageName)
+    if (taskRunner) {
+      if (taskRunner.commands.test != null) {
+        taskRunner.add('test', implementation.packageName + ' && ' + taskRunner.commands.test)
+      } else {
+        taskRunner.add('test', implementation.packageName)
+      }
     }
   }
 }
