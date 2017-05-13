@@ -107,7 +107,7 @@ export default class TypeScriptCompiler {
 
     await this._fs.writeFile(testFile, [
       ...(head ? [head] : []),
-      "import { Node } from 'tweed'",
+      "import { VirtualNode } from 'tweed'",
       "import App from '../src/App'",
       '',
       "describe('App', () => {",
@@ -154,7 +154,7 @@ export default class TypeScriptCompiler {
 
   async app () {
     return [
-      "import { mutating, Node } from 'tweed'",
+      "import { mutating, VirtualNode } from 'tweed'",
       '',
       'export default class App {',
       "  @mutating name = 'World'",
@@ -167,7 +167,7 @@ export default class TypeScriptCompiler {
       '    this.name = (event.target as HTMLInputElement).value',
       '  }',
       '',
-      '  render (): Node {',
+      '  render (): VirtualNode {',
       '    return (',
       '      <div>',
       '        <h1>Hello {this.name}</h1>',

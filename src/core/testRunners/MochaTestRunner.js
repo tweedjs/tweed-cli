@@ -37,7 +37,7 @@ export default class MochaTestRunner {
   _appTest () {
     return [
       "const { expect } = require('chai')",
-      "const { Node: n } = require('tweed')",
+      "const { VirtualNode: n } = require('tweed')",
       "const App = require('../src/App')",
       '',
       "describe('App', () => {",

@@ -217,7 +217,7 @@ export default class Builder {
       "'use strict'",
       '',
       "var Tweed = require('tweed')",
-      'var n = Tweed.Node',
+      'var n = Tweed.VirtualNode',
       '',
       'function App () {',
       "  this.name = 'World'",

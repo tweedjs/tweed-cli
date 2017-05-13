@@ -1,5 +1,5 @@
 class StandardJS {
-  jsxHeader = '/** @jsx Node */'
+  jsxHeader = '/** @jsx VirtualNode */'
   packageName = 'standard'
 
   modifyPackageJson (pkg, compiler, testRunner, packageManager) {

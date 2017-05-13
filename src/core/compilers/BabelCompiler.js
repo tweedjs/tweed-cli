@@ -81,7 +81,7 @@ export default class BabelCompiler {
 
     await this._fs.writeFile(testFile, [
       ...(linter && linter.jsxHeader ? [linter.jsxHeader, ''] : []),
-      "import { Node } from 'tweed'",
+      "import { VirtualNode } from 'tweed'",
       "import App from '../src/App'",
       ...(head ? [head] : []),
       '',
@@ -130,7 +130,7 @@ export default class BabelCompiler {
   async app (linter) {
     return [
       ...(linter && linter.jsxHeader ? [linter.jsxHeader, ''] : []),
-      "import { mutating, Node } from 'tweed'",
+      "import { mutating, VirtualNode } from 'tweed'",
       '',
       'export default class App {',
       "  @mutating name = 'World'",

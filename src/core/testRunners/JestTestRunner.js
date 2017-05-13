@@ -44,7 +44,7 @@ export default class JestTestRunner {
 
   _appTest () {
     return [
-      "const { Node: n } = require('tweed')",
+      "const { VirtualNode: n } = require('tweed')",
       "const App = require('../src/App')",
       '',
       "describe('App', () => {",

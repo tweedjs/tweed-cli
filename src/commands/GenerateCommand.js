@@ -182,14 +182,14 @@ export default class GenerateCommand {
     const useStandard = 'standard' in pkg.devDependencies
 
     if (useStandard) {
-      return '/** @jsx Node */'
+      return '/** @jsx VirtualNode */'
     }
   }
 
   _generateTypeScript (name, mutating) {
     const isStateful = mutating.length > 0
     return `
-import { ${isStateful ? 'mutating, ' : ''}Node } from 'tweed'
+import { ${isStateful ? 'mutating, ' : ''}VirtualNode } from 'tweed'
 
 export default class ${name} {${
   isStateful ? (
@@ -200,7 +200,7 @@ export default class ${name} {${
       .join('') + '\n'
   ) : ''
 }
-  render (): Node {
+  render (): VirtualNode {
     return <div />
   }
 }
@@ -211,7 +211,7 @@ export default class ${name} {${
     const isStateful = mutating.length > 0
     const jsxHeader = this._jsxHeader()
     return `${jsxHeader ? jsxHeader + '\n' : ''}
-import { ${isStateful ? 'mutating, ' : ''}Node } from 'tweed'
+import { ${isStateful ? 'mutating, ' : ''}VirtualNode } from 'tweed'
 
 export default class ${name} {${
   isStateful ? (
@@ -235,7 +235,7 @@ export default class ${name} {${
 'use strict'
 
 var Tweed = require('tweed')
-var n = Tweed.Node${
+var n = Tweed.VirtualNode${
   isStateful ? (`
 var mutating = Tweed.mutating`
   ) : ''
@@ -265,7 +265,7 @@ ${name}.prototype.render = function () {
     return `${
   head ? '\n' + head : ''
 }
-import { Node } from 'tweed'
+import { VirtualNode } from 'tweed'
 import ${className} from '${importPath}'
 
 describe('${className}', () => {
@@ -286,7 +286,7 @@ describe('${className}', () => {
     return `${jsxHeader ? jsxHeader + '\n' : ''}${
   head ? '\n' + head : ''
 }
-import { Node } from 'tweed'
+import { VirtualNode } from 'tweed'
 import ${className} from '${importPath}'
 
 describe('${className}', () => {
@@ -306,7 +306,7 @@ describe('${className}', () => {
     return `${
   head ? '\n' + head : ''
 }
-const { Node: n } = require('tweed')
+const { VirtualNode: n } = require('tweed')
 const ${className} = require('${importPath}')
 
 describe('${className}', () => {
